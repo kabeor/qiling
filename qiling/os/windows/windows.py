@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 #
 # Cross Platform and Multi Architecture Advanced Binary Emulation Framework
-# Built on top of Unicorn emulator (www.unicorn-engine.org)
+#
 
 import types, logging
 
@@ -11,7 +11,6 @@ from qiling.arch.x86_const import *
 from qiling.arch.x86 import *
 from qiling.const import *
 from qiling.os.os import QlOs
-
 from .dlls import *
 from .const import *
 from .utils import *
@@ -56,6 +55,7 @@ class QlOsWindows(QlOs):
         elif self.ql.archtype == QL_ARCH.X8664:
             ql_x8664_set_gs(self.ql)
 
+
     def setupComponents(self):
         # handle manager
         self.handle_manager = HandleManager()
@@ -72,6 +72,7 @@ class QlOsWindows(QlOs):
         # more handle manager
         new_handle = Handle(obj=main_thread)
         self.handle_manager.append(new_handle)
+
 
     # hook WinAPI in PE EMU
     def hook_winapi(self, int, address, size):
@@ -119,6 +120,7 @@ class QlOsWindows(QlOs):
                 logging.warning("[!] %s is not implemented" % winapi_name)
                 if self.ql.debug_stop:
                     raise QlErrorSyscallNotFound("[!] Windows API Implementation Not Found")
+
 
     def run(self):
         if self.ql.exit_point is not None:

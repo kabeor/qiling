@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
 # 
 # Cross Platform and Multi Architecture Advanced Binary Emulation Framework
-# Built on top of Unicorn emulator (www.unicorn-engine.org) 
+#
 
 from binascii import crc32
 
 from qiling.os.const import *
-from .fncc import *
-from .utils import *
-from .ProcessorBind import *
-from .UefiSpec import *
+from qiling.os.uefi.fncc import *
+from qiling.os.uefi.utils import *
+from qiling.os.uefi.ProcessorBind import *
+from qiling.os.uefi.UefiSpec import *
 
 # TODO: find a better solution than hardcoding this
 pointer_size = 8
@@ -237,6 +237,7 @@ def hook_HandleProtocol(ql, address, params):
 
 	if handle in hdict and protocol in hdict[handle]:
 		write_int64(ql, interface, hdict[handle][protocol])
+		return EFI_SUCCESS
 
 	return EFI_NOT_FOUND
 

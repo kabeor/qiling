@@ -1,22 +1,19 @@
 #!/usr/bin/env python3
 #
 # Cross Platform and Multi Architecture Advanced Binary Emulation Framework
-# Built on top of Unicorn emulator (www.unicorn-engine.org)
+#
 
-import traceback, logging
+import logging, traceback
 
 from unicorn import *
 from unicorn.x86_const import *
 from unicorn.arm64_const import *
 
 from qiling.arch.x86 import *
-
 from qiling.const import *
 from qiling.os.const import *
 from qiling.os.posix.posix import QlOsPosix
-
 from .const import *
-
 from qiling.os.macos import macos
 from qiling.os.macos.structs import *
 from qiling.os.macos.events.macos_structs import *
@@ -35,6 +32,7 @@ class QlOsMacos(QlOsPosix):
         self.hook_ret = {}
         self.pid = self.profile.getint("KERNEL","pid")
         self.load()
+
 
     # load MacOS driver
     def load_kext(self):
@@ -142,6 +140,7 @@ class QlOsMacos(QlOsPosix):
             self.savedrip=0xffffff80009c2c16
             self.ql.run(begin=self.ql.loader.kext_start)
 
+
     def load(self):
         if self.ql.shellcoder:
             return
@@ -161,10 +160,12 @@ class QlOsMacos(QlOsPosix):
     def hook_syscall(self, intno= None, int = None):
         return self.load_syscall()
 
+
     def hook_sigtrap(self, intno= None, int = None):
         logging.info("[!] Trap Found")
         self.emu_error()
         exit(1)
+
 
     def run(self):
         #save initial stack pointer, so we can see if stack is balanced when

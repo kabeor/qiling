@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
 # 
 # Cross Platform and Multi Architecture Advanced Binary Emulation Framework
-# Built on top of Unicorn emulator (www.unicorn-engine.org) 
+#
+
+import logging
+
 from unicorn import *
 from unicorn.x86_const import *
 
@@ -70,7 +73,7 @@ class QlArchX8664(QlArch):
 
         x64_register_mappings = [
             reg_map_8, reg_map_16, reg_map_32, reg_map_64,
-            reg_map_cr, reg_map_st, reg_map_misc, reg_map_r
+            reg_map_cr, reg_map_st, reg_map_misc, reg_map_r, reg_map_seg_base
         ]
 
         for reg_maper in x64_register_mappings:
@@ -147,6 +150,7 @@ class GDTManager:
         gdt_entry = self._create_gdt_entry(SEGMENT_ADDR, SEGMENT_SIZE, SPORT, QL_X86_F_PROT_32)
         self.ql.mem.write(self.gdt_addr + (index << 3), gdt_entry)
         # self.gdt_used[index] = True
+        logging.debug(f"Write to {hex(self.gdt_addr + (index << 3))} for new entry {gdt_entry}")
 
 
     def get_gdt_buf(self, start, end):

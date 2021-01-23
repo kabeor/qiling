@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # 
 # Cross Platform and Multi Architecture Advanced Binary Emulation Framework
-# Built on top of Unicorn emulator (www.unicorn-engine.org) 
+#
 
 from qiling.arch.x86 import *
 from qiling.const import *
@@ -14,13 +14,15 @@ class QlOsFreebsd(QlOsPosix):
         super(QlOsFreebsd, self).__init__(ql)
         self.pid = self.profile.getint("KERNEL","pid")
         self.load()
-        
+
+
     def load(self):   
         self.ql.hook_insn(self.hook_syscall, UC_X86_INS_SYSCALL)
         self.gdtm = GDTManager(self.ql)
         ql_x86_register_cs(self)
         ql_x86_register_ds_ss_es(self)
-        
+
+
     def hook_syscall(self, intno= None):
         return self.load_syscall()
 

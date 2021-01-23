@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
 # 
 # Cross Platform and Multi Architecture Advanced Binary Emulation Framework
-# Built on top of Unicorn emulator (www.unicorn-engine.org) 
+#
+
 import struct, logging
+
 from unicorn.x86_const import *
 from unicorn.mips_const import *
-from qiling.os.utils import *
 
+from qiling.os.utils import *
 
 DWORD = 1
 UINT = 1
@@ -121,7 +123,7 @@ def set_function_params(ql, in_params, out_params):
             if ptr == 0:
                 out_params[each] = 0
             else:
-                out_params[each] = read_wstring(ql, ptr)
+                out_params[each] = ql.os.read_wstring(ptr)
         index += 1
     return index
 

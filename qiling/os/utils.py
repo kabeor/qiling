@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # 
 # Cross Platform and Multi Architecture Advanced Binary Emulation Framework
-# Built on top of Unicorn emulator (www.unicorn-engine.org) 
+#
 
 """
 This module is intended for general purpose functions that are only used in qiling.os
@@ -16,7 +16,6 @@ from unicorn.arm_const import *
 from unicorn.x86_const import *
 from unicorn.arm64_const import *
 from unicorn.mips_const import *
-
 from capstone import *
 from capstone.arm_const import *
 from capstone.x86_const import *
@@ -27,7 +26,6 @@ from keystone import *
 from qiling.const import *
 from qiling.exception import *
 from .const import *
-
 from qiling.os.windows.wdk_const import *
 from qiling.os.windows.structs import *
 from qiling.utils import verify_ret
@@ -244,6 +242,8 @@ class QlOsUtils:
 
         if not self.md:
             self.md = self.ql.create_disassembler()
+        elif self.ql.archtype == QL_ARCH.ARM: # Update disassembler for arm considering thumb swtich.
+            self.md = self.ql.create_disassembler()
 
         insn = self.md.disasm(tmp, address)
         opsize = int(size)
@@ -340,9 +340,11 @@ class QlOsUtils:
         def _parse_param(param):
             name, value = param
 
-            if isinstance(value, str) or type(value) == bytearray:
+            if type(value) is str:
                 return f'{name:s} = "{value}"'
-            elif isinstance(value, tuple):
+            elif type(value) is bytearray:
+                return f'{name:s} = "{value.decode("utf-8")}"'
+            elif type(value) is tuple:
                 # we just need the string, not the address in the log
                 return f'{name:s} = "{value[1]}"'
 
@@ -364,7 +366,7 @@ class QlOsUtils:
             log = log.partition(" ")[-1]
             logging.info(log)
 
-    def printf(self, address, fmt, params_addr, name, wstring=False):
+    def vprintf(self, address, fmt, params_addr, name, wstring=False):
         count = fmt.count("%")
         params = []
         if count > 0:
@@ -373,7 +375,10 @@ class QlOsUtils:
                 params.append(
                     self.ql.unpack(param)
                 )
+        return self.printf(address, fmt, params, name, wstring)
 
+    def printf(self, address, fmt, params, name, wstring=False):
+        if len(params) > 0:
             formats = fmt.split("%")[1:]
             index = 0
             for f in formats:

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # 
 # Cross Platform and Multi Architecture Advanced Binary Emulation Framework
-# Built on top of Unicorn emulator (www.unicorn-engine.org) 
+#
 
 from qiling.const import *
 
@@ -246,3 +246,5 @@ arm_open_flags = {
     'O_NOFOLLOW' : 0x20000,
     'O_SYNC'     : 0x101000,
 }
+
+ECHILD = -10

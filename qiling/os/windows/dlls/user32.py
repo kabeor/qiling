@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 # 
 # Cross Platform and Multi Architecture Advanced Binary Emulation Framework
-# Built on top of Unicorn emulator (www.unicorn-engine.org) 
+#
 
 import struct
 import logging
+
 from qiling.os.windows.fncc import *
 from qiling.os.const import *
 from qiling.os.windows.utils import *
@@ -540,12 +541,11 @@ def hook_CharPrevA(ql, address, params):
 def hook_wsprintfW(ql, address, params):
     dst, p_format = ql.os.get_function_param(2)
 
-    sp = ql.reg.esp if ql.archtype == QL_ARCH.X86 else ql.reg.rsp
-    p_args = sp + ql.pointersize * 3
     format_string = ql.os.read_wstring(p_format)
-    size, string = ql.os.printf(address, format_string, p_args, "wsprintfW", wstring=True)
-
     count = format_string.count('%')
+    args = ql.os.get_function_param(2 + count)[2:]
+    size, string = ql.os.printf(address, format_string, args, "wsprintfW", wstring=True)
+
     if ql.archtype == QL_ARCH.X8664:
         # We must pop the stack correctly
         raise QlErrorNotImplemented("[!] API not implemented")
@@ -561,11 +561,12 @@ def hook_wsprintfW(ql, address, params):
 # );
 @winsdkapi(cc=CDECL, dllname=dllname, param_num=3)
 def hook_sprintf(ql, address, params):
-    dst, p_format, p_args = ql.os.get_function_param(3)
+    dst, p_format = ql.os.get_function_param(2)
     format_string = ql.os.read_wstring(p_format)
-    size, string = ql.os.printf(address, format_string, p_args, "sprintf", wstring=True)
-
     count = format_string.count('%')
+    args = ql.os.get_function_param(2 + count)[2:]
+    size, string = ql.os.printf(address, format_string, args, "sprintf", wstring=True)
+
     if ql.archtype == QL_ARCH.X8664:
         # We must pop the stack correctly
         raise QlErrorNotImplemented("[!] API not implemented")
@@ -631,10 +632,11 @@ def hook_wvsprintfA(ql, address, params):
 @winsdkapi(cc=CDECL, dllname=dllname, param_num=3)
 def hook_wsprintfA(ql, address, params):
     dst, p_format, p_args = ql.os.get_function_param(3)
-    format_string = read_cstring(ql, p_format)
-    size, string = printf(ql, address, format_string, p_args, "wsprintfA")
-
+    format_string = ql.os.read_cstring(p_format)
     count = format_string.count('%')
+    args = ql.os.get_function_param(2 + count)[2:]
+    size, string = ql.os.printf(address, format_string, args, "wsprintfA")
+
     if ql.archtype== QL_ARCH.X8664:
         # We must pop the stack correctly
         raise QlErrorNotImplemented("[!] API not implemented")

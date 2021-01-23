@@ -1,12 +1,10 @@
 #!/usr/bin/env python3
 # 
 # Cross Platform and Multi Architecture Advanced Binary Emulation Framework
-# Built on top of Unicorn emulator (www.unicorn-engine.org) 
+#
 
-import os
-import json
-import struct
-import logging
+import json, logging, os, struct
+
 from functools import wraps
 
 from qiling.os.const import *
@@ -14,7 +12,7 @@ from qiling.os.windows.utils import *
 from qiling.const import *
 from qiling.exception import *
 from qiling.os.windows.structs import *
-        
+     
 
 def replacetype(type, specialtype=None):
     if specialtype is None:
@@ -27,6 +25,7 @@ def replacetype(type, specialtype=None):
             return specialtype[type]
     else:
         return type
+
 
 # x86/x8664 PE should share Windows APIs
 def winsdkapi(cc, param_num=None, dllname=None, replace_params_type=None, replace_params={}, passthru=False):
@@ -51,10 +50,10 @@ def winsdkapi(cc, param_num=None, dllname=None, replace_params_type=None, replac
                 winsdk_path = os.path.join(windows_abspath[:-11], 'extensions', 'windows_sdk', 'defs', dllname + '.json')
 
                 if os.path.exists(winsdk_path):
-                    f = open(winsdk_path, 'r')
-                    funclist = json.load(f)
+                    with open(winsdk_path, 'r') as f:
+                        funclist = json.load(f)
                 else:
-                    logging.info('[!]', winsdk_path, 'not found')
+                    logging.info('[!] %s not found', winsdk_path)
                 if funcname not in funclist:
                     params = replace_params
                 else:

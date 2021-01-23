@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 # 
 # Cross Platform and Multi Architecture Advanced Binary Emulation Framework
-# Built on top of Unicorn emulator (www.unicorn-engine.org) 
+#
 
-import os, re, logging
+import logging, os, re
 
 from qiling.const import *
 from qiling.exception import *
@@ -183,8 +183,13 @@ class QlMemoryManager:
 
 
     def write(self, addr: int, data: bytes) -> None:
-        return self.ql.uc.mem_write(addr, data)
-
+        try:
+            self.ql.uc.mem_write(addr, data)
+        except:
+            self.show_mapinfo()
+            logging.debug("addresss write length: " + str(len(data)))
+            logging.error("addresss write error: " + hex(addr))
+            raise
 
     def search(self, needle: bytes, begin= None, end= None):
         """
@@ -444,12 +449,6 @@ class QlMemoryHeap:
         self.mem_alloc = saved_state['mem_alloc']
 
     def alloc(self, size):
-        
-        if self.ql.archbit == 32:
-            size = self.ql.mem.align(size, 4)
-        elif self.ql.archbit == 64:
-            size = self.ql.mem.align(size, 8)
-
         # Find the heap chunks that best matches size 
         self.chunks.sort(key=Chunk.compare)
         for chunk in self.chunks:
